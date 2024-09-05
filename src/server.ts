@@ -1,12 +1,44 @@
 require('dotenv').config();
 import express, { Request, Response } from 'express';
 import { DirectedGraph } from './DirectedGraph';
+import { swaggerUi, specs } from '../swagger';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Swagger UI setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+/**
+ * @swagger
+ * /calculate:
+ *   post:
+ *     summary: Calculate the path
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               edges:
+ *                 type: array
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *             example:
+ *               edges: [['IND', 'EWR'], ['SFO', 'ATL'], ['GSO', 'IND'], ['ATL', 'GSO']]
+ *     responses:
+ *       200:
+ *         description: Successful operation
+ *       400:
+ *         description: Client error
+ *       500:
+ *         description: Server error
+ */
 app.post('/calculate', (req: Request, res: Response)=>{
     const { edges }: { edges: [string, string][]} = req.body;
 
@@ -58,6 +90,15 @@ app.post('/calculate', (req: Request, res: Response)=>{
     }
 });
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Welcome message
+ *     responses:
+ *       200:
+ *         description: Returns a welcome message
+ */
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
 });
