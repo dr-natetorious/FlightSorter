@@ -11,8 +11,14 @@ app.post('/calculate', (req: Request, res: Response)=>{
     const { edges }: { edges: [string, string][]} = req.body;
 
     if(!edges || !Array.isArray(edges)){
-        return res.status(400).send('Invalid Payload. Expected [[str,str],...] like: [[A, B], [D, E], [B, C]]');
+        return res.status(400).json({
+            operation: 'ClientError',
+            error:{
+                message: 'Invalid Payload. Expected [[str,str],...] like: [[A, B], [D, E], [B, C]]'
+            }
+        });
     }
+
     try{
         const graph = DirectedGraph.fromEdges(edges);
         const heads = graph.findHeads();
@@ -25,8 +31,8 @@ app.post('/calculate', (req: Request, res: Response)=>{
             });
         }
 
-        return res.json({
-            operation: 'Error',
+        return res.status(400).json({
+            operation: 'ClientError',
             error:{
                 message: `Unexpected count of Heads (${heads.length} != 1) or Tails (${tails.length} != 1)`,
                 debug: {
@@ -38,7 +44,17 @@ app.post('/calculate', (req: Request, res: Response)=>{
         })
 
     } catch (error) {
+        let message = 'An unknown error occurred';
+        if (error instanceof Error){
+            message = error.message;
+        }
 
+        return res.status(500).json({
+            operation: 'ServerErrror',
+            error:{
+                message
+            }
+        });
     }
 });
 
