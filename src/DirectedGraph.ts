@@ -119,4 +119,16 @@ export class DirectedGraph<T> {
             console.log(`${vertex} -> ${edges.join(', ')}`);
         }
     }
+
+    /**
+     * Returns a string representation of the graph.
+     * @returns A string representing the graph.
+     */
+    toString(): string {
+        let representation = '';
+        for (let [vertex, edges] of this.adjacencyList) {
+            representation += `${vertex} -> ${edges.join(', ')}\n`;
+        }
+        return representation.trim();
+    }
 }
