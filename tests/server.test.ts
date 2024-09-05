@@ -1,9 +1,7 @@
 import request from 'supertest';
-import express, { Request, Response } from 'express';
+import app from '../src/server';
 
 
-const app = express();
-app.use(express.json());
 
 describe('POST /calculate', () => {
     it('should return Complete with path for edges [[SFO, EWR]]', async () => {

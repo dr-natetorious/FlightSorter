@@ -50,7 +50,7 @@ app.post('/calculate', (req: Request, res: Response)=>{
         }
 
         return res.status(500).json({
-            operation: 'ServerErrror',
+            operation: 'ServerError',
             error:{
                 message
             }
@@ -65,3 +65,5 @@ app.get('/', (req: Request, res: Response) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
 });
+
+export default app;
