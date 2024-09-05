@@ -2,7 +2,6 @@ import request from 'supertest';
 import app from '../src/server';
 
 
-
 describe('POST /calculate', () => {
     it('should return Complete with path for edges [[SFO, EWR]]', async () => {
         const response = await request(app)
@@ -75,4 +74,44 @@ describe('POST /calculate', () => {
         expect(response.body.operation).toBe('ServerError');
         expect(response.body.error.message).toBe('Vertices cannot be null or undefined');
     });
+
+    // Edge case: Loop in the graph
+    it('should return ClientError for graph with a loop', async () => {
+        const response = await request(app)
+            .post('/calculate')
+            .send({ edges: [['A', 'B'], ['B', 'C'], ['C', 'A']] });
+
+        expect(response.status).toBe(400);
+        expect(response.body.operation).toBe('ClientError');
+        expect(response.body.error.message).toContain('Unexpected count of Heads');
+        expect(response.body.error.debug.heads).toEqual([]);
+        expect(response.body.error.debug.tails).toEqual([]);
+    });
+
+    // Edge case: Self-loop
+    it('should return ClientError for graph with a self-loop', async () => {
+        const response = await request(app)
+            .post('/calculate')
+            .send({ edges: [['A', 'A']] });
+
+        expect(response.status).toBe(400);
+        expect(response.body.operation).toBe('ClientError');
+        expect(response.body.error.message).toContain('Unexpected count of Heads');
+        expect(response.body.error.debug.heads).toEqual([]);
+        expect(response.body.error.debug.tails).toEqual([]);
+    });
+
+    // Edge case: Multiple loops
+    it('should return ClientError for graph with multiple loops', async () => {
+        const response = await request(app)
+            .post('/calculate')
+            .send({ edges: [['A', 'B'], ['B', 'C'], ['C', 'A'], ['D', 'E'], ['E', 'D']] });
+
+        expect(response.status).toBe(400);
+        expect(response.body.operation).toBe('ClientError');
+        expect(response.body.error.message).toContain('Unexpected count of Heads');
+        expect(response.body.error.debug.heads).toEqual([]);
+        expect(response.body.error.debug.tails).toEqual([]);
+    });
+
 });
