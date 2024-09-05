@@ -1,0 +1,18 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "Simple flight path API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "dev": "nodemon server.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "build": "tsc"
+  },
+  "keywords": [
+    "VolumeFi"
+  ],
+  "author": "Dr. Nate",
+  "license": "ISC"
+}
