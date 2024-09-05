@@ -38,3 +38,4 @@ describe('DirectedGraph', () => {
         expect(graph.getNeighbors('A')).toBeUndefined();
     });
 });
+

@@ -3,9 +3,26 @@
  */
 export class DirectedGraph<T> {
     private adjacencyList: Map<T, T[]>;
+    private inDegree: Map<T, number>;
+    private outDegree: Map<T, number>;
 
     constructor() {
         this.adjacencyList = new Map();
+        this.inDegree = new Map();
+        this.outDegree = new Map();
+    }
+
+    
+    /* Builds the graph from a list of edges.
+    * @param edges - A list of edges, where each edge is a tuple of two vertices.
+    * @throws Will throw an error if the edge format is invalid.
+    */
+    static fromEdges<T>(edges: [T, T][]): DirectedGraph<T> {
+        const graph = new DirectedGraph<T>();
+        edges.forEach(([vertex1, vertex2]) => {
+            graph.addEdge(vertex1, vertex2);
+        });
+        return graph;
     }
 
     /**
@@ -19,6 +36,8 @@ export class DirectedGraph<T> {
         }
         if (!this.adjacencyList.has(vertex)) {
             this.adjacencyList.set(vertex, []);
+            this.inDegree.set(vertex, 0);
+            this.outDegree.set(vertex, 0);
         }
     }
 
@@ -39,6 +58,8 @@ export class DirectedGraph<T> {
             this.addVertex(vertex2);
         }
         this.adjacencyList.get(vertex1)?.push(vertex2);
+        this.inDegree.set(vertex2, (this.inDegree.get(vertex2) || 0) + 1);
+        this.outDegree.set(vertex1, (this.outDegree.get(vertex1) || 0) + 1);
     }
 
     /**
@@ -52,6 +73,42 @@ export class DirectedGraph<T> {
             throw new Error('Vertex cannot be null or undefined');
         }
         return this.adjacencyList.get(vertex);
+    }
+
+    /**
+     * Gets all vertices in the graph.
+     * @returns An array of all vertices.
+     */
+    getVertices(): IterableIterator<T> {
+        return this.adjacencyList.keys();
+    }
+
+    /**
+     * Finds the head vertices (sources) of the graph.
+     * @returns An array of vertices with no incoming edges.
+     */
+    findHeads(): T[] {
+        const heads: T[] = [];
+        for (let [vertex, degree] of this.inDegree) {
+            if (degree === 0) {
+                heads.push(vertex);
+            }
+        }
+        return heads;
+    }
+
+    /**
+     * Finds the tail vertices (sinks) of the graph.
+     * @returns An array of vertices with no outgoing edges.
+     */
+    findTails(): T[] {
+        const tails: T[] = [];
+        for (let [vertex, degree] of this.outDegree) {
+            if (degree === 0) {
+                tails.push(vertex);
+            }
+        }
+        return tails;
     }
 
     /**
