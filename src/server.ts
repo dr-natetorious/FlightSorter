@@ -1,7 +1,7 @@
 require('dotenv').config();
 import express, { Request, Response } from 'express';
 import { DirectedGraph } from './DirectedGraph';
-import { swaggerUi, specs } from '../swagger';
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,7 +9,10 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 // Swagger UI setup
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+if(process.env.SWAGGER === 'true'){
+    const { swaggerUi, specs } = require('../swagger');
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+}
 
 /**
  * @swagger

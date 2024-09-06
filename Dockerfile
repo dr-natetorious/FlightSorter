@@ -17,6 +17,7 @@ CMD ["npm", "test"]
 FROM build AS debug
 RUN npm install -g nodemon
 ENV PORT=3000
+RUN SWAGGER=true
 EXPOSE 3000
 EXPOSE 9229
 CMD ["npm", "run", "dev"]
