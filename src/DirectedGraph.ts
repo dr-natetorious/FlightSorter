@@ -104,7 +104,7 @@ export class DirectedGraph<T> {
         if (sccs.length == 3){
             return sccs[1];
         }
-        
+
         return [];
     }
 
@@ -164,12 +164,41 @@ export class DirectedGraph<T> {
      */
     findTails(): T[] {
         const tails: T[] = [];
+        const heads = this.findHeads();
+
         for (let [vertex, degree] of this.outDegree) {
             if (degree === 0) {
-                tails.push(vertex);
+                for (let head of heads) {
+                    if (this.isReachable(head, vertex)) {
+                        tails.push(vertex);
+                        break;
+                    }
+                }
             }
         }
+
         return tails;
+    }
+
+    private isReachable(source: T, target: T): boolean {
+        const visited = new Set<T>();
+        const stack: T[] = [source];
+
+        while (stack.length > 0) {
+            const vertex = stack.pop()!;
+            if (vertex === target) {
+                return true;
+            }
+            if (!visited.has(vertex)) {
+                visited.add(vertex);
+                const neighbors = this.getNeighbors(vertex) || [];
+                for (let neighbor of neighbors) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -45,9 +45,39 @@ describe('GraphBuilder', () => {
         expect(graph.getNeighbors('C')).toEqual(['A', 'D']);
         expect(graph.getNeighbors('D')).toEqual([]);
 
-        // Undetermined cycle
+        // There's no path to D
         expect(graph.findHeads()).toEqual([]);
-        expect(graph.findTails()).toEqual(['D']);
+        expect(graph.findTails()).toEqual([]);
+    });
+
+    test('should build a graph from edges [[A, B], [B, C], [C, E], [C, D]]', () => {
+        const edges = [['A', 'B'], ['B', 'C'], ['C', 'E'], ['C', 'D']] as [string, string][];
+        
+        const graph = DirectedGraph.fromEdges(edges);
+        expect(graph.getNeighbors('A')).toEqual(['B']);
+        expect(graph.getNeighbors('B')).toEqual(['C']);
+        expect(graph.getNeighbors('C')).toEqual(['E', 'D']);
+        expect(graph.getNeighbors('D')).toEqual([]);
+
+        // There's no path to D
+        expect(graph.findHeads()).toEqual(['A']);
+        expect(graph.findTails()).toEqual(['E','D']);
+    });
+
+    test('should build a graph from edges [[A, B], [B, C], [E, F], [C, D]]', () => {
+        const edges = [['A', 'B'], ['B', 'C'], ['E', 'F'], ['C', 'D']] as [string, string][];
+        
+        const graph = DirectedGraph.fromEdges(edges);
+        expect(graph.getNeighbors('A')).toEqual(['B']);
+        expect(graph.getNeighbors('B')).toEqual(['C']);
+        expect(graph.getNeighbors('C')).toEqual(['D']);
+        expect(graph.getNeighbors('D')).toEqual([]);
+        expect(graph.getNeighbors('E')).toEqual(['F']);
+        expect(graph.getNeighbors('F')).toEqual([]);
+
+        // There's no path to D
+        expect(graph.findHeads()).toEqual(['A','E']);
+        expect(graph.findTails()).toEqual(['F','D']);
     });
     
     test('should build a graph from edges [[A, B], [B, C], [C, D], [D, B], [C, E]]', () => {
