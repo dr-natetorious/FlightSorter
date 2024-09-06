@@ -120,4 +120,45 @@ describe('GraphBuilder', () => {
         expect(graph.findTails()).toEqual([]);
     });
     
+    test('should build a graph from edges [[A, B], [C, C]]', () => {
+        const edges = [['A', 'B'], ['C', 'C']] as [string, string][];
+        
+        const graph = DirectedGraph.fromEdges(edges);
+        expect(graph.getNeighbors('A')).toEqual(['B']);
+        expect(graph.getNeighbors('B')).toEqual([]);
+        expect(graph.getNeighbors('C')).toEqual(['C']);
+        expect(graph.findHeads()).toEqual(['A']);
+        expect(graph.findTails()).toEqual(['B']);
+    });
+    
+    test('should build a graph from edges [[A, B], [C, C], [C, C], [C, C], [C, C], [C, D], [D, B]]', () => {
+        const edges = [['A', 'B'], ['C', 'C'], ['C', 'C'], ['C', 'C'], ['C', 'C'], ['C', 'D'], ['D', 'B']] as [string, string][];
+        
+        const graph = DirectedGraph.fromEdges(edges);
+        expect(graph.getNeighbors('A')).toEqual(['B']);
+        expect(graph.getNeighbors('B')).toEqual([]);
+        expect(graph.getNeighbors('C')).toEqual(['C', 'C', 'C', 'C', 'D']);
+        expect(graph.getNeighbors('D')).toEqual(['B']);
+        expect(graph.findHeads()).toEqual(['A']);
+        expect(graph.findTails()).toEqual(['B']);
+    });
+    
+    test('should sequences without full connectivty have head/tail', () => {
+        const edges = [['A', 'B'], ['B', 'C'], ['C', 'A'], ['A', 'B'], ['B', 'D'], ['D', 'E']] as [string, string][];
+        
+        const graph = DirectedGraph.fromEdges(edges);
+        expect(graph.getNeighbors('A')).toEqual(['B', 'B']);
+        expect(graph.getNeighbors('B')).toEqual(['C', 'D']);
+        expect(graph.getNeighbors('C')).toEqual(['A']);
+        expect(graph.getNeighbors('D')).toEqual(['E']);
+        expect(graph.getNeighbors('E')).toEqual([]);
+
+        // What's the expected behavior for here?
+        expect(graph.isStronglyConnected()).toBeFalsy();
+
+        expect(graph.findHeads()).toEqual(['D']);
+        expect(graph.findTails()).toEqual(['E']);
+    });
+    
+    
 });

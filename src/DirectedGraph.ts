@@ -180,6 +180,12 @@ export class DirectedGraph<T> {
         return tails;
     }
 
+    /**
+     * Check if a path exists between two nodes.
+     * @param source the head to begin
+     * @param target the tail to reach
+     * @returns True if a path exists
+     */
     private isReachable(source: T, target: T): boolean {
         const visited = new Set<T>();
         const stack: T[] = [source];
@@ -199,6 +205,47 @@ export class DirectedGraph<T> {
         }
 
         return false;
+    }
+
+    isStronglyConnected(): boolean {
+        const visited = new Set<T>();
+        const vertices = Array.from(this.adjacencyList.keys());
+
+        if (vertices.length === 0) return true;
+
+        // Step 1: Perform DFS from the first vertex
+        this.dfs(vertices[0], visited);
+        if (visited.size !== vertices.length) return false;
+
+        // Step 2: Get the transpose of the graph
+        const transpose = this.getTranspose();
+
+        // Step 3: Perform DFS on the transposed graph
+        const visitedTranspose = new Set<T>();
+        transpose.dfs(vertices[0], visitedTranspose);
+
+        return visitedTranspose.size === vertices.length;
+    }
+
+    private dfs(vertex: T, visited: Set<T>, stack: T[] = []): void {
+        visited.add(vertex);
+        const neighbors = this.adjacencyList.get(vertex) || [];
+        for (let neighbor of neighbors) {
+            if (!visited.has(neighbor)) {
+                this.dfs(neighbor, visited, stack);
+            }
+        }
+        stack.push(vertex);
+    }
+
+    private getTranspose(): DirectedGraph<T> {
+        const transpose = new DirectedGraph<T>();
+        for (let [vertex, neighbors] of this.adjacencyList) {
+            for (let neighbor of neighbors) {
+                transpose.addEdge(neighbor, vertex);
+            }
+        }
+        return transpose;
     }
 
     /**

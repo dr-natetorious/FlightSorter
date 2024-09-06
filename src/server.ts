@@ -39,33 +39,33 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *       500:
  *         description: Server error
  */
-app.post('/calculate', (req: Request, res: Response)=>{
-    const { edges }: { edges: [string, string][]} = req.body;
+app.post('/calculate', (req: Request, res: Response) => {
+    const { edges }: { edges: [string, string][] } = req.body;
 
-    if(!edges || !Array.isArray(edges)){
+    if (!edges || !Array.isArray(edges)) {
         return res.status(400).json({
             operation: 'ClientError',
-            error:{
+            error: {
                 message: 'Invalid Payload. Expected [[str,str],...] like: [[A, B], [D, E], [B, C]]'
             }
         });
     }
 
-    try{
+    try {
         const graph = DirectedGraph.fromEdges(edges);
         const heads = graph.findHeads();
         const tails = graph.findTails();
 
-        if (heads.length === 1 && tails.length === 1){
+        if (heads.length === 1 && tails.length === 1) {
             return res.json({
                 operation: 'Complete',
-                path: [heads[0], tails[0]]
+                path: [heads[0], tails[0]],
             });
         }
 
         return res.status(400).json({
             operation: 'ClientError',
-            error:{
+            error: {
                 message: `Unexpected count of Heads (${heads.length} != 1) or Tails (${tails.length} != 1)`,
                 debug: {
                     heads,
@@ -77,13 +77,13 @@ app.post('/calculate', (req: Request, res: Response)=>{
 
     } catch (error) {
         let message = 'An unknown error occurred';
-        if (error instanceof Error){
+        if (error instanceof Error) {
             message = error.message;
         }
 
         return res.status(500).json({
             operation: 'ServerError',
-            error:{
+            error: {
                 message
             }
         });
