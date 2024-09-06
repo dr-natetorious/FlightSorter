@@ -11,6 +11,65 @@ Examples:
 [['IND', 'EWR'], ['SFO', 'ATL'], ['GSO', 'IND'], ['ATL', 'GSO']] => ['SFO', 'EWR']
 ```
 
+## Message Formats
+
+The `calculate` endpoint expects payloads in the following format:
+
+### Request payloads
+
+```json
+{
+  "edges": [
+    [
+      "IND",
+      "EWR"
+    ],
+    [
+      "SFO",
+      "ATL"
+    ],
+    [
+      "GSO",
+      "IND"
+    ],
+    [
+      "ATL",
+      "GSO"
+    ]
+  ]
+}
+```
+
+### Success messages
+
+You will receive messages in the following format:
+
+```json
+{
+    "operation": "Complete",
+    "path": ["heads[0], tails[0]"],
+}
+```
+
+### Error responses
+
+It will respond in the following format:
+
+```json
+{
+    "operation": "ClientError | ServerError",
+    "error": {
+        "message": "Message here",
+        "debug": {
+            "heads": ["list here"],
+            "tails": ["list here"],
+            "graph": "graph.toString()"
+        }
+    }
+}
+
+```
+
 ## Setup your local environment
 
 This project uses a multi-stage Dockerfile to streamline the development processes. You can start at of the following stages:
