@@ -88,13 +88,74 @@ export class DirectedGraph<T> {
      * @returns An array of vertices with no incoming edges.
      */
     findHeads(): T[] {
+        // Perform fast check for normal path
         const heads: T[] = [];
         for (let [vertex, degree] of this.inDegree) {
             if (degree === 0) {
                 heads.push(vertex);
             }
         }
-        return heads;
+
+        if (heads.length > 0){
+            return heads;
+        }
+
+        const sccs = this.findSCCs();
+        if (sccs.length == 3){
+            return sccs[1];
+        }
+        
+        return [];
+    }
+
+    /**
+     * Finds the Strongly connected connectivity.
+     * @returns [cycle,heads,tails]
+     */
+    findSCCs(): T[][] {
+        const indexMap = new Map<T, number>();
+        const lowLinkMap = new Map<T, number>();
+        const stack: T[] = [];
+        const onStack = new Set<T>();
+        const sccs: T[][] = [];
+        let index = 0;
+
+        const dfs = (vertex: T) => {
+            indexMap.set(vertex, index);
+            lowLinkMap.set(vertex, index);
+            index++;
+            stack.push(vertex);
+            onStack.add(vertex);
+
+            const neighbors = this.getNeighbors(vertex) || [];
+            for (let neighbor of neighbors) {
+                if (!indexMap.has(neighbor)) {
+                    dfs(neighbor);
+                    lowLinkMap.set(vertex, Math.min(lowLinkMap.get(vertex)!, lowLinkMap.get(neighbor)!));
+                } else if (onStack.has(neighbor)) {
+                    lowLinkMap.set(vertex, Math.min(lowLinkMap.get(vertex)!, indexMap.get(neighbor)!));
+                }
+            }
+
+            if (lowLinkMap.get(vertex) === indexMap.get(vertex)) {
+                const scc: T[] = [];
+                let w: T;
+                do {
+                    w = stack.pop()!;
+                    onStack.delete(w);
+                    scc.push(w);
+                } while (w !== vertex);
+                sccs.push(scc);
+            }
+        };
+
+        for (let vertex of this.adjacencyList.keys()) {
+            if (!indexMap.has(vertex)) {
+                dfs(vertex);
+            }
+        }
+
+        return sccs;
     }
 
     /**
