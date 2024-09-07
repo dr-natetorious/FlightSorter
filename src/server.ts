@@ -13,7 +13,7 @@ try {
     const { swaggerUi, specs } = require('../swagger');
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 } catch (error) {
-    console.log(`Swagger isn't available for this session because ${error}.`);
+    console.warn(`Swagger UI not enabled because: ${error}.`);
 }
 
 /**
